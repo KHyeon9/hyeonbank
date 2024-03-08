@@ -4,6 +4,7 @@ import com.springsecurity.hyeonbank.model.Customer;
 import com.springsecurity.hyeonbank.repository.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     private CustomerRepository customerRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public LoginController(CustomerRepository customerRepository) {
+    public LoginController(CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
         this.customerRepository = customerRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
@@ -23,6 +26,8 @@ public class LoginController {
         ResponseEntity response = null;
 
         try {
+            String hashPassword = passwordEncoder.encode(customer.getPwd());
+            customer.setPwd(hashPassword);
             saveCustomer = customerRepository.save(customer);
 
             if (saveCustomer.getId() > 0) {
