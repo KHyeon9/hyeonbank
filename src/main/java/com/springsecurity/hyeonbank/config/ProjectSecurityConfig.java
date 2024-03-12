@@ -15,7 +15,7 @@ public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers("/myAccount", "/myBalance", "/myLoans", "myCards")
+                        .requestMatchers("/myAccount", "/myBalance", "/myLoans", "myCards", "/user")
                         .authenticated() // 위 주소들을 로그인 해야 볼 수 있도록 함
                         .requestMatchers("/notices", "/contact", "/register")
                         .permitAll() // 위 두 주소만 로그인 없이 볼 수 있도록 함
