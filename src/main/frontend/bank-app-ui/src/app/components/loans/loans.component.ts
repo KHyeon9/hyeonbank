@@ -18,6 +18,7 @@ export class LoansComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = JSON.parse(sessionStorage.getItem('userdetails') || "");
+    
     if(this.user){
       this.dashboardService.getLoansDetails(this.user.id).subscribe(
         responseData => {
