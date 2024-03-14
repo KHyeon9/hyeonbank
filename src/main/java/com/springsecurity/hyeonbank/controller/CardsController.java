@@ -18,8 +18,8 @@ public class CardsController {
     }
 
     @GetMapping("myCards")
-    public List<Cards> getCardDetails(@RequestParam int customerId) {
-        List<Cards> cards = cardsRepository.findByCustomerId(customerId);
+    public List<Cards> getCardDetails(@RequestParam int id) {
+        List<Cards> cards = cardsRepository.findByCustomerId(id);
 
         return cards;
     }

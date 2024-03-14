@@ -37,7 +37,7 @@ public class LoginController {
             saveCustomer = customerRepository.save(customer);
 
 
-            if (saveCustomer.getCustomerId() > 0) {
+            if (saveCustomer.getId() > 0) {
                 response = ResponseEntity
                         .status(HttpStatus.CREATED)
                         .body("유저 정보들이 성공적으로 생성되었습니다.");
