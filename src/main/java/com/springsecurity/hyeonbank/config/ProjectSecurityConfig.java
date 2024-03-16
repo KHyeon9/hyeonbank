@@ -62,7 +62,17 @@ public class ProjectSecurityConfig {
                 )
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/myAccount", "/myBalance", "/myLoans", "myCards", "/user")
+                        /*
+                        .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+                        .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT", "VIEWBALANCE")
+                        .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+                        .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
+                        */
+                        .requestMatchers("/myAccount").hasRole("USER")
+                        .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/myLoans").hasRole("USER")
+                        .requestMatchers("/myCards").hasRole("USER")
+                        .requestMatchers("/user")
                         .authenticated() // 위 주소들을 로그인 해야 볼 수 있도록 함
                         .requestMatchers("/notices", "/contact", "/register")
                         .permitAll() // 위 두 주소만 로그인 없이 볼 수 있도록 함
