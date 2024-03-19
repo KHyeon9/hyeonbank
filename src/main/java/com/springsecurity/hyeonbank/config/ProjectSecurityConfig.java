@@ -1,5 +1,7 @@
 package com.springsecurity.hyeonbank.config;
 
+import com.springsecurity.hyeonbank.filter.AuthoritiesLoggingAfterFilter;
+import com.springsecurity.hyeonbank.filter.AuthoritiesLoggingAtFilter;
 import com.springsecurity.hyeonbank.filter.CsrfCookieFilter;
 import com.springsecurity.hyeonbank.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,6 +65,8 @@ public class ProjectSecurityConfig {
                 )
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/myAccount").hasRole("USER")
                         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
