@@ -1,6 +1,9 @@
 package com.springsecurity.hyeonbank.config;
 
+import com.springsecurity.hyeonbank.filter.AuthoritiesLoggingAfterFilter;
+import com.springsecurity.hyeonbank.filter.AuthoritiesLoggingAtFilter;
 import com.springsecurity.hyeonbank.filter.CsrfCookieFilter;
+import com.springsecurity.hyeonbank.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class ProjectSecurityConfig {
@@ -27,16 +31,20 @@ public class ProjectSecurityConfig {
         // 추가하여 HTML 폼(form)을 보여줄 때 해당 폼에 CSRF 토큰을 포함시킵니다.
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
+        // jsessionid를 생성하는 것을 멈추기 위해 제거
+//        http.securityContext(context -> context
+//                        // SecurityContext를 변경할 때 명시적으로 저장할 필요가 없도록 설정합니다.
+//                        // 이렇게 하면 Security 프레임 워크에 작업을 위임해서
+//                        // SecurityContext가 자동으로 저장합니다.
+//                        .requireExplicitSave(false)
+//                ).sessionManagement(session -> session
+//                        // 항상 새로운 세션을 만들도록 설정합니다.
+//                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+//                )
 
-        http.securityContext(context -> context
-                        // SecurityContext를 변경할 때 명시적으로 저장할 필요가 없도록 설정합니다.
-                        // 이렇게 하면 Security 프레임 워크에 작업을 위임해서
-                        // SecurityContext가 자동으로 저장합니다.
-                        .requireExplicitSave(false)
-                ).sessionManagement(session -> session
-                        // 항상 새로운 세션을 만들도록 설정합니다.
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-                ).cors(
+        // jsessionid를 생성하지 않고 stateless로 설정
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .cors(
                 cors -> cors.configurationSource(
                                 new CorsConfigurationSource() {
                                     @Override
@@ -46,6 +54,9 @@ public class ProjectSecurityConfig {
                                          config.setAllowedMethods(Collections.singletonList("*"));
                                          config.setAllowCredentials(true);
                                          config.setAllowedHeaders(Collections.singletonList("*"));
+                                        // 브라우저가 jwt토큰을 받을수 있도록 설정
+                                        // csrf의 경우 프레임워크가 제공한 헤더이어서 필요없었지만 jwt는 직접 작성하기 때문에 필요
+                                         config.setExposedHeaders(List.of("Authorization"));
                                          config.setMaxAge(3600L);
                                          return config;
                                     }
@@ -61,13 +72,10 @@ public class ProjectSecurityConfig {
                         )
                 )
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        /*
-                        .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-                        .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT", "VIEWBALANCE")
-                        .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
-                        .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
-                        */
                         .requestMatchers("/myAccount").hasRole("USER")
                         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/myLoans").hasRole("USER")
