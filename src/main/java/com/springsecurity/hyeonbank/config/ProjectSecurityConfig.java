@@ -1,9 +1,6 @@
 package com.springsecurity.hyeonbank.config;
 
-import com.springsecurity.hyeonbank.filter.AuthoritiesLoggingAfterFilter;
-import com.springsecurity.hyeonbank.filter.AuthoritiesLoggingAtFilter;
-import com.springsecurity.hyeonbank.filter.CsrfCookieFilter;
-import com.springsecurity.hyeonbank.filter.RequestValidationBeforeFilter;
+import com.springsecurity.hyeonbank.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,6 +72,7 @@ public class ProjectSecurityConfig {
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
                 .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/myAccount").hasRole("USER")
                         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
