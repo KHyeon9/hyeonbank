@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
+    // JWT 토큰을 생성하는 필터
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
