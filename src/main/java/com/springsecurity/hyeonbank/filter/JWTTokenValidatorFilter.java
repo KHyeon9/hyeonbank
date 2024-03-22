@@ -24,9 +24,9 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
             throws ServletException, IOException {
         // 요청에서 헤더에 있는 JWT 토큰을 가져옴
-        String jwt_header = request.getHeader(SecurityConstants.JWT_HEADER);
+        String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
 
-        if (jwt_header != null) {
+        if (jwt != null) {
             try {
                 SecretKey key = Keys.hmacShaKeyFor(
                         SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
@@ -34,18 +34,18 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 Claims claims = Jwts.parser()
                         .verifyWith(key)
                         .build()
-                        .parseSignedClaims(jwt_header)
+                        .parseSignedClaims(jwt)
                         .getPayload();
 
                 String username = String.valueOf(claims.get("username"));
                 String authorities = (String) claims.get("authorities");
-                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                Authentication auth = new UsernamePasswordAuthenticationToken(
                         username,
                         null,
                         AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)
                 );
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (Exception e) {
                 throw new BadCredentialsException("잘못된 토큰을 받았습니다!");
             }
@@ -55,7 +55,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         return request.getServletPath().equals("/user");
     }
 }
