@@ -77,7 +77,7 @@ public class ProjectSecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/myAccount").hasRole("USER")
                         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/myLoans").hasRole("USER")
+                        .requestMatchers("/myLoans").authenticated()
                         .requestMatchers("/myCards").hasRole("USER")
                         .requestMatchers("/user")
                         .authenticated() // 위 주소들을 로그인 해야 볼 수 있도록 함
