@@ -23,7 +23,8 @@ import java.util.Set;
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
     // JWT 토큰을 생성하는 필터
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
@@ -38,6 +39,7 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
                     .expiration(new Date((new Date()).getTime() + 30000000))
                     // 서명에 사용될 key를 추가
                     .signWith(key).compact();
+
             // 요청의 헤더에 jwt토큰 포함
             response.setHeader(SecurityConstants.JWT_HEADER, jwt);
         }
