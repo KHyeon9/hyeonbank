@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
+@Deprecated // 인증 때, db의 도움을 받지 않음 -> KeyCloak을 사용하기 때문에
 public class HyeonBankUsernamePasswordAuthenticationProvider implements AuthenticationProvider {
 
     private CustomerRepository customerRepository;
