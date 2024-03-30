@@ -18,38 +18,38 @@ import java.util.List;
 public class LoginController {
 
     private CustomerRepository customerRepository;
-    private PasswordEncoder passwordEncoder;
+    // private PasswordEncoder passwordEncoder;
 
-    public LoginController(CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+    public LoginController(CustomerRepository customerRepositor) {
         this.customerRepository = customerRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody Customer customer) {
-        Customer saveCustomer = null;
-        ResponseEntity response = null;
-
-        try {
-            String hashPassword = passwordEncoder.encode(customer.getPwd());
-            customer.setPwd(hashPassword);
-            customer.setCreateDt(new Date(System.currentTimeMillis()));
-            saveCustomer = customerRepository.save(customer);
-
-
-            if (saveCustomer.getId() > 0) {
-                response = ResponseEntity
-                        .status(HttpStatus.CREATED)
-                        .body("유저 정보들이 성공적으로 생성되었습니다.");
-            }
-        } catch (Exception e) {
-            response = ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("예외가 발생되었습니다 : " + e.getMessage());
-        }
-
-        return response;
-    }
+    // DB에 사용자 정보를 저장하지 않음
+    //    @PostMapping("/register")
+    //    public ResponseEntity<String> registerUser(@RequestBody Customer customer) {
+    //        Customer saveCustomer = null;
+    //        ResponseEntity response = null;
+    //
+    //        try {
+    //            String hashPassword = passwordEncoder.encode(customer.getPwd());
+    //            customer.setPwd(hashPassword);
+    //            customer.setCreateDt(new Date(System.currentTimeMillis()));
+    //            saveCustomer = customerRepository.save(customer);
+    //
+    //
+    //            if (saveCustomer.getId() > 0) {
+    //                response = ResponseEntity
+    //                        .status(HttpStatus.CREATED)
+    //                        .body("유저 정보들이 성공적으로 생성되었습니다.");
+    //            }
+    //        } catch (Exception e) {
+    //            response = ResponseEntity
+    //                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+    //                    .body("예외가 발생되었습니다 : " + e.getMessage());
+    //        }
+    //
+    //        return response;
+    //    }
 
     @RequestMapping("/user")
     public Customer getUserDetailsAfterLogin(Authentication authentication) {
