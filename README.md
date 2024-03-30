@@ -15,9 +15,14 @@ spring을 이용해서 spring security를 공부합니다.
 * MySQL Driver
 * Spring Boot DevTools
 * JWT
+* OAuth
 
 ## 그 외
 * AngularJS
+* KeyCloak
 
 ## Reference
 * https://www.udemy.com/course/spring-security-6-jwt-oauth2-korean/?couponCode=ST14MT32124
+
+## Important Links
+* http://localhost:8180/realms/hyeonbankdev/protocol/openid-connect/certs (KeyCloak Well known APIs)
