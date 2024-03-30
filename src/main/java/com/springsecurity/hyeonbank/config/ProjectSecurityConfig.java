@@ -4,11 +4,11 @@ import com.springsecurity.hyeonbank.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -29,15 +29,18 @@ public class ProjectSecurityConfig {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
         // jsessionid를 생성하는 것을 멈추기 위해 제거
-//        http.securityContext(context -> context
-//                        // SecurityContext를 변경할 때 명시적으로 저장할 필요가 없도록 설정합니다.
-//                        // 이렇게 하면 Security 프레임 워크에 작업을 위임해서
-//                        // SecurityContext가 자동으로 저장합니다.
-//                        .requireExplicitSave(false)
-//                ).sessionManagement(session -> session
-//                        // 항상 새로운 세션을 만들도록 설정합니다.
-//                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-//                )
+        // http.securityContext(context -> context
+        // SecurityContext를 변경할 때 명시적으로 저장할 필요가 없도록 설정합니다.
+        // 이렇게 하면 Security 프레임 워크에 작업을 위임해서
+        // SecurityContext가 자동으로 저장합니다.
+        // requireExplicitSave(false)
+        // ).sessionManagement(session -> session
+        // 항상 새로운 세션을 만들도록 설정합니다.
+        //      .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+        // )
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
 
         // jsessionid를 생성하지 않고 stateless로 설정
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -69,11 +72,12 @@ public class ProjectSecurityConfig {
                         )
                 )
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
-                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+                // KeyCloak을 서버로 했으므로 우리가 jwt 토큰을 생성할 필요가 없음
+                // .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                // .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                // .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                // .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                // .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/myAccount").hasRole("USER")
                         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
@@ -81,15 +85,19 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/myCards").hasRole("USER")
                         .requestMatchers("/user")
                         .authenticated() // 위 주소들을 로그인 해야 볼 수 있도록 함
-                        .requestMatchers("/notices", "/contact", "/register")
+                        .requestMatchers("/notices","/contact","/register")
                         .permitAll() // 위 두 주소만 로그인 없이 볼 수 있도록 함
                 )
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults());
+                .oauth2ResourceServer(server ->
+                        server.jwt(jwtConfigurer ->
+                                jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)
+                        )
+                );
         return http.build();
     }
 
     @Bean
+    @Deprecated // KeyCloak이 해결
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
