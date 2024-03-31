@@ -27,3 +27,4 @@ spring을 이용해서 spring security를 공부합니다.
 
 ## Important Links
 * http://localhost:8180/realms/hyeonbankdev/protocol/openid-connect/certs (KeyCloak Well known APIs)
+* https://www.npmjs.com/package/keycloak-angular (Angular Keycloak library)
