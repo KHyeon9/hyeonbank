@@ -1,5 +1,5 @@
 # hyeonbank
-spring을 이용해서 spring security를 강의를 통해서 공부합니다.
+spring으로 spring security 강의를 통해서 공부합니다.
 
 ## 개발 환경
 * Intellij IDEA Ultimate 2023.2.2
