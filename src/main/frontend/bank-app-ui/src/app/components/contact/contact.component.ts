@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Contact } from "src/app/model/contact.model";
 import { NgForm } from '@angular/forms';
-import { getCookie } from 'typescript-cookie';
 import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
 
 
@@ -26,7 +25,7 @@ export class ContactComponent implements OnInit {
     this.dashboardService.saveMessage(this.model).subscribe(
       responseData => {
         this.contacts = <any> responseData.body;
-        this.contacts.forEach(function(this: ContactComponent, contact: Contact) {
+        this.contacts.forEach(function (this: ContactComponent, contact: Contact) {
           this.model = contact;
         }.bind(this));
         contactForm.resetForm();
