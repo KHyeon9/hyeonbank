@@ -13,18 +13,18 @@ public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedA
     // spring이 이해할 수 있도록 변환
 
     @Override
-    public Collection<GrantedAuthority> convert(Jwt source) {
-        Map<String, Object> realmAccess = (Map<String, Object>) source.getClaims().get("realm_access");
+    public Collection<GrantedAuthority> convert(Jwt jwt) {
+        Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
 
         if (realmAccess == null || realmAccess.isEmpty()) {
             return new ArrayList<>();
         }
 
-        Collection<GrantedAuthority> realmValue = ((List<String>) realmAccess.get("roles"))
+        Collection<GrantedAuthority> returnValue = ((List<String>) realmAccess.get("roles"))
                 .stream().map(roleName -> "ROLE_" + roleName)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        return realmValue;
+        return returnValue;
     }
 }
